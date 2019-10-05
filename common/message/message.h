@@ -24,7 +24,6 @@
 #include <iostream>
 #include <streambuf>
 #include <vector>
-#include <sys/time.h>
 #include "common/endian.hpp"
 #include "common/timeDefs.h"
 

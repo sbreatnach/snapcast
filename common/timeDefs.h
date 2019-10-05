@@ -21,10 +21,15 @@
 
 #include <chrono>
 #include <thread>
-#include <sys/time.h>
 #ifdef MACOS
 #include <mach/clock.h>
 #include <mach/mach.h>
+#endif
+
+#ifdef WINDOWS
+#include "wintime.h"
+#else
+#include <sys/time.h>
 #endif
 
 namespace chronos

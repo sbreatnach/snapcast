@@ -20,7 +20,9 @@
 #define SIGNAL_HANDLER_H
 
 #include <signal.h>
-#include <syslog.h>
+#include "aixlog.hpp"
+
+using namespace std;
 
 extern volatile sig_atomic_t g_terminated;
 
@@ -29,19 +31,21 @@ void signal_handler(int sig)
 
 	switch(sig)
 	{
+#ifndef WINDOWS
 	case SIGHUP:
-		syslog(LOG_WARNING, "Received SIGHUP signal.");
+		SLOG(WARNING) << "Received SIGHUP signal." << std::endl;
 		break;
+#endif
 	case SIGTERM:
-		syslog(LOG_WARNING, "Received SIGTERM signal.");
+		SLOG(WARNING) << "Received SIGTERM signal." << std::endl;
 		g_terminated = true;
 		break;
 	case SIGINT:
-		syslog(LOG_WARNING, "Received SIGINT signal.");
+		SLOG(WARNING) << "Received SIGINT signal." << std::endl;
 		g_terminated = true;
 		break;
 	default:
-		syslog(LOG_WARNING, "Unhandled signal ");
+		SLOG(WARNING) << "Unhandled signal." << std::endl;
 		break;
 	}
 }

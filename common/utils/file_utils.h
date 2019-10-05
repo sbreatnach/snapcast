@@ -19,7 +19,11 @@
 #ifndef FILE_UTILS_H
 #define FILE_UTILS_H
 
+#ifdef WINDOWS
+#include <direct.h>
+#else
 #include <grp.h>
+#endif
 #include <pwd.h>
 #include <stdexcept>
 #include <vector>
@@ -42,6 +46,7 @@ static bool exists(const std::string& filename)
 
 static void do_chown(const std::string& file_path, const std::string& user_name, const std::string& group_name)
 {
+#ifndef WINDOWS // no-op on Windows (for now)
 	if (user_name.empty() && group_name.empty())
 		return;
 
@@ -69,6 +74,7 @@ static void do_chown(const std::string& file_path, const std::string& user_name,
 
 	if (chown(file_path.c_str(), uid, gid) == -1)
 		throw std::runtime_error("chown failed");
+#endif
 }
 
 
@@ -82,7 +88,12 @@ static int mkdirRecursive(const char *path, mode_t mode)
 		if (p.empty())
 			continue;
 		ss << "/" << p;
+#ifndef WINDOWS
 		int res = mkdir(ss.str().c_str(), mode);
+#else
+		// mode ignored on Windows
+		int res = _mkdir(ss.str().c_str());
+#endif
 		if ((res != 0) && (errno != EEXIST))
 			return res;
 	}

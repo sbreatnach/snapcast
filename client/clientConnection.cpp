@@ -59,7 +59,7 @@ std::string ClientConnection::getMacAddress() const
 	if (socket_ == nullptr)
 		throw SnapException("socket not connected");
 
-	std::string mac = ::getMacAddress(socket_->native_handle());
+	std::string mac = ::getMacAddress(socket_);
 	if (mac.empty())
 		mac = "00:00:00:00:00:00";
 	LOG(INFO) << "My MAC: \"" << mac << "\", socket: " << socket_->native_handle() << "\n";

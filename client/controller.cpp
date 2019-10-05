@@ -19,6 +19,8 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <chrono>
+#include <thread>
 #include "controller.h"
 #include "decoder/pcmDecoder.h"
 #if defined(HAS_OGG) && (defined(HAS_TREMOR) || defined(HAS_VORBIS))
@@ -131,6 +133,8 @@ void Controller::onMessageReceived(ClientConnection* connection, const msg::Base
 		player_.reset(new OpenslPlayer(pcmDevice_, stream_));
 #elif HAS_COREAUDIO
 		player_.reset(new CoreAudioPlayer(pcmDevice_, stream_));
++#elif HAS_WASAPI
+		player_.reset(new WASAPIPlayer(pcmDevice_, stream_));
 #else
 		throw SnapException("No audio player support");
 #endif
