@@ -41,10 +41,8 @@ struct timezone
   int  tz_dsttime;     /* type of dst correction */
 };
 
-struct timespec { long tv_sec; long tv_nsec; };
-
 int gettimeofday(struct timeval *tv, struct timezone *tz);
 int clock_gettime(int dummy, struct timespec *ct);
 
 
-#endif
+#endifndef

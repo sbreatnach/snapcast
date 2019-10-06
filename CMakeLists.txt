@@ -20,12 +20,19 @@ if (NOT BUILD_CLIENT AND NOT BUILD_SERVER)
     message(FATAL_ERROR "One or both of BUILD_CLIENT or BUILD_SERVER must be set to ON to build")
 endif()
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/" "${CMAKE_SOURCE_DIR}/cmake/modules/")
+
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(MACOSX TRUE)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     set (FREEBSD TRUE)
     if (BUILD_CLIENT)
         message(FATAL_ERROR "Snapclient not yet supported for FreeBSD, use \"-DBUILD_CLIENT=OFF\"")
+      endif()
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set (WIN32 TRUE)
+    if (BUILD_SERVER)
+        message(FATAL_ERROR "Snapserver not yet supported for Windows, use \"-DBUILD_SERVER=OFF\"")
     endif()
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Android")
     set (ANDROID TRUE)
@@ -53,9 +60,10 @@ endif()
 set(INCLUDE_DIRS
     "${CMAKE_SOURCE_DIR}"
     "${CMAKE_SOURCE_DIR}/externals/asio/asio/include"
+    "${CMAKE_SOURCE_DIR}/externals/popl/include"
+    "${CMAKE_SOURCE_DIR}/externals/aixlog/include"
     "${CMAKE_INSTALL_INCLUDEDIR}")
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 add_definitions(-DVERSION="${PROJECT_VERSION}")
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
@@ -64,6 +72,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 # Configure compiler options
 set(CMAKE_CXX_STANDARD 11)
+
+if(WIN32)
+    add_definitions(-DNTDDI_VERSION=0x06020000 -D_WIN32_WINNT=0x0602 -DWINVER=0x0602 -DWINDOWS -DWIN32_LEAN_AND_MEAN -DUNICODE -D_UNICODE -D_CRT_SECURE_NO_WARNINGS)
+endif()
 
 # Get arch
 include(${CMAKE_SOURCE_DIR}/cmake/TargetArch.cmake)
@@ -86,8 +98,10 @@ IF(${BIGENDIAN})
 ENDIF(${BIGENDIAN})
 
 # Check dependencies
-find_package(PkgConfig REQUIRED)
 find_package(Threads REQUIRED)
+if(NOT WIN32)
+    find_package(PkgConfig REQUIRED)
+endif()
 
 include(CMakePushCheckState)
 include(CheckIncludeFileCXX)
@@ -99,8 +113,11 @@ if(MACOSX)
     endif (BONJOUR_FOUND)
 
     add_definitions(-DFREEBSD -DHAS_DAEMON)
-elseif(ANDROID)
-#    add_definitions("-DNO_CPP11_STRING")
+elseif(WIN32)
+    find_package(FLAC REQUIRED)
+    find_package(Ogg REQUIRED)
+    find_package(Vorbis REQUIRED)
+    find_package(mDNSResponder REQUIRED)
 else()
     if (BUILD_CLIENT)
         pkg_search_module(ALSA REQUIRED alsa)
@@ -122,6 +139,14 @@ else()
         list(APPEND INCLUDE_DIRS "/usr/local/include")
         list(APPEND CMAKE_REQUIRED_INCLUDES "${INCLUDE_DIRS}")
     endif()
+endif()
+
+if(NOT WIN32)
+    pkg_search_module(FLAC flac)
+    pkg_search_module(OGG ogg)
+    pkg_search_module(VORBIS vorbis)
+    pkg_search_module(TREMOR vorbisidec)
+    pkg_search_module(VORBISENC vorbisenc)
 endif()
 
 include_directories(${INCLUDE_DIRS})
@@ -154,31 +179,21 @@ if(NOT HAS_CXX11_STRING_SUPPORT)
     add_definitions("-DNO_CPP11_STRING")
 endif()
 
-pkg_search_module(FLAC flac)
 if (FLAC_FOUND)
     add_definitions("-DHAS_FLAC")
 endif (FLAC_FOUND)
-
-pkg_search_module(OGG ogg)
 if (OGG_FOUND)
     add_definitions("-DHAS_OGG")
 endif (OGG_FOUND)
-
-pkg_search_module(VORBIS vorbis)
 if (VORBIS_FOUND)
     add_definitions("-DHAS_VORBIS")
 endif (VORBIS_FOUND)
-
-pkg_search_module(TREMOR vorbisidec)
 if (TREMOR_FOUND)
     add_definitions("-DHAS_TREMOR")
 endif (TREMOR_FOUND)
-
-pkg_search_module(VORBISENC vorbisenc)
 if (VORBISENC_FOUND)
     add_definitions("-DHAS_VORBISENC")
 endif()
-
 
 add_subdirectory(common)
 
