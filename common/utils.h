@@ -34,17 +34,34 @@
 #include <memory>
 #include <cerrno>
 #include <iterator>
+#ifndef WINDOWS
+#include <windows.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <netinet/in.h>
+#include <unistd.h>
+#include <sys/utsname.h>
+
+#define POPEN_FN popen
+#define PCLOSE_FN pclose
+
+#else
+#include <Windows.h>
+#include <stdio.h>
+#include <VersionHelpers.h>
+#include <IPTypes.h>
+#include <iphlpapi.h>
+
+#define POPEN_FN _popen
+#define PCLOSE_FN _pclose
+
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <iomanip>
-#ifndef FREEBSD
+#if !defined(FREEBSD) && !defined(WINDOWS)
 #include <sys/sysinfo.h>
 #endif
-#include <sys/utsname.h>
 #ifdef MACOS
 #include <ifaddrs.h>
 #include <net/if_dl.h>
@@ -69,7 +86,7 @@ static std::string execGetOutput(const std::string& cmd)
 		+ " 2> /dev/null"
 #endif
 	;
-	std::shared_ptr<FILE> pipe(popen(fullCmd.c_str(), "r"), pclose);
+	std::shared_ptr<FILE> pipe(POPEN_FN(fullCmd.c_str(), "r"), PCLOSE_FN);
 	if (!pipe)
 		return "";
 	char buffer[1024];
@@ -142,7 +159,7 @@ static std::string getOS()
 		}
 	}
 #endif
-+#ifndef WINDOWS
+#ifndef WINDOWS
 	if (os.empty())
 	{
 		utsname u;
@@ -263,7 +280,7 @@ static std::string generateUUID()
 
 
 /// https://gist.github.com/OrangeTide/909204
-static std::string getMacAddress(tcp::socket* socket_)
+static std::string getMacAddress(std::shared_ptr<asio::basic_stream_socket<asio::ip::tcp>> socket_)
 {
 	char mac[19];
 #ifdef WINDOWS

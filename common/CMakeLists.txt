@@ -1,1 +1,5 @@
-add_library(common STATIC daemon.cpp sampleFormat.cpp)
+if(WIN32)
+    add_library(common STATIC sampleFormat.cpp wintime.cpp)
+else()
+    add_library(common STATIC daemon.cpp sampleFormat.cpp)
+endif()

@@ -21,18 +21,20 @@
 
 #include <time.h>
 #include <windows.h>
+#include <WinSock2.h>
+
+#define CLOCK_MONOTONIC 1
 
 // from the GNU C library implementation of sys/time.h
-#define timersub(a, b, result)                                                 \
-  do {                                                                         \
-    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;                              \
-    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;                           \
-    if ((result)->tv_usec < 0) {                                              \
-      --(result)->tv_sec;                                                      \
-      (result)->tv_usec += 1000000;                                            \
-    }                                                                          \
+#define timersub(a, b, result)                          \
+  do {                                                  \
+    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;       \
+    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;    \
+    if ((result)->tv_usec < 0) {                        \
+      --(result)->tv_sec;                               \
+      (result)->tv_usec += 1000000;                     \
+    }                                                   \
   } while (0)
-#endif
 
 
 struct timezone
@@ -44,5 +46,4 @@ struct timezone
 int gettimeofday(struct timeval *tv, struct timezone *tz);
 int clock_gettime(int dummy, struct timespec *ct);
 
-
-#endifndef
+#endif

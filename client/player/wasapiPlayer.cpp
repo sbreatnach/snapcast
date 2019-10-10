@@ -314,7 +314,7 @@ void WASAPIPlayer::worker()
 		}
 		else
 		{
-			logO << "Failed to get chunk\n";
+			LOG(DEBUG) << "Failed to get chunk\n";
 			
 			hr = audioClient->Stop();
 			CHECK_HR(hr);
@@ -322,7 +322,7 @@ void WASAPIPlayer::worker()
 			CHECK_HR(hr);
 			
 			while (active_ && !stream_->waitForChunk(100))
-				logD << "Waiting for chunk\n";
+				LOG(DEBUG) << "Waiting for chunk\n";
 			
 			hr = audioClient->Start();
 			CHECK_HR(hr);

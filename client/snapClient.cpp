@@ -98,7 +98,7 @@ int main (int argc, char **argv)
 		auto groffSwitch =    op.add<Switch, Attribute::hidden>("", "groff", "produce groff message");
 		auto debugOption =    op.add<Implicit<string>, Attribute::hidden>("", "debug", "enable debug logging", "");
 		auto versionSwitch =  op.add<Switch>("v", "version", "show version number");
-#if defined(HAS_ALSA)
+#if defined(HAS_ALSA) || defined(HAS_WASAPI)
 		auto listSwitch =     op.add<Switch>("l", "list", "list pcm devices");
 		/*auto soundcardValue =*/ op.add<Value<string>>("s", "soundcard", "index or name of the soundcard", "default", &soundcard);
 #endif

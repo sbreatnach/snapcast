@@ -117,11 +117,11 @@ using message_ptr = std::shared_ptr<msg::BaseMessage>;
 
 struct BaseMessage
 {
-	BaseMessage() : type(kBase), id(0), refersTo(0)
+	BaseMessage() : type(kBase), id(0), refersTo(0), size(0)
 	{
 	}
 
-	BaseMessage(message_type type_) : type(type_), id(0), refersTo(0)
+	BaseMessage(message_type type_) : type(type_), id(0), refersTo(0), size(0)
 	{
 	}
 

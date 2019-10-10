@@ -18,8 +18,9 @@
 
 #include "wintime.h"
 #include <iostream>
+#include <sysinfoapi.h>
+#include <profileapi.h>
 
-using namespace System;
 using namespace std;
 
 // the following is lifted directly from

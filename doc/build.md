@@ -241,3 +241,28 @@ And finally run the build:
 This example will show you how to add snapcast to [Buildroot](https://buildroot.org/) and compile for Raspberry Pi.
 
 * https://github.com/nickaknudson/snapcast-pi
+
+## Windows (Native)
+
+Install Visual Studio. The following steps have been tested with VS 2019 Community Edition. It is assumed that the C++ workload components have been installed, including the optional MFC component.
+
+To simplify installation of dependencies, this guide will use vcpkg to install libraries and configure CMake. **NB snapserver is not supported.**
+
+Open the Developer Command Prompt for your Visual Studio installation and run the following:
+
+    cd %USERPROFILE%
+    mkdir winprojects
+    git clone https://github.com/microsoft/vcpkg
+    cd vcpkg
+    bootstrap-vcpkg.bat
+    vcpkg.exe integrate install
+    vcpkg.exe install libogg libflac libvorbis mdnsresponder
+    cd ..
+    git clone https://github.com/badaix/snapcast.git
+    cd snapcast
+    mkdir build
+    cd build
+    cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_TOOLCHAIN_FILE=%USERPROFILE%/winprojects/vcpkg/scripts/buildsystems/vcpkg.cmake -DBUILD_SERVER=OFF ..
+    msbuild snapcast.sln
+
+You should now have a snapclient.exe available in `%USERPROFile%/winprojects/snapcast/bin/Debug`, along with the required DLLs.

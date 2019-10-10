@@ -75,6 +75,8 @@ set(CMAKE_CXX_STANDARD 11)
 
 if(WIN32)
     add_definitions(-DNTDDI_VERSION=0x06020000 -D_WIN32_WINNT=0x0602 -DWINVER=0x0602 -DWINDOWS -DWIN32_LEAN_AND_MEAN -DUNICODE -D_UNICODE -D_CRT_SECURE_NO_WARNINGS)
+    # enable C++14 mode to allow deprecated C++ constructs in newer VS
+    string(APPEND CMAKE_CXX_FLAGS " /std:c++14")
 endif()
 
 # Get arch
@@ -114,6 +116,7 @@ if(MACOSX)
 
     add_definitions(-DFREEBSD -DHAS_DAEMON)
 elseif(WIN32)
+    set(CHECK_INCLUDE_FLAGS "-DUNICODE -D_UNICODE /std:c++14")
     find_package(FLAC REQUIRED)
     find_package(Ogg REQUIRED)
     find_package(Vorbis REQUIRED)
@@ -142,6 +145,7 @@ else()
 endif()
 
 if(NOT WIN32)
+    set(CHECK_INCLUDE_FLAGS "-std=c++11")
     pkg_search_module(FLAC flac)
     pkg_search_module(OGG ogg)
     pkg_search_module(VORBIS vorbis)
@@ -163,12 +167,12 @@ endif()
 
 list(APPEND CMAKE_REQUIRED_INCLUDES "${INCLUDE_DIRS}")
 
-check_include_file_cxx(popl.hpp HAS_POPL_HPP -std=c++11)
+check_include_file_cxx(popl.hpp HAS_POPL_HPP "${CHECK_INCLUDE_FLAGS}")
 if(NOT HAS_POPL_HPP)
     message(FATAL_ERROR "Need to have popl installed")
 endif()
 
-check_include_file_cxx(aixlog.hpp HAS_AIXLOG_HPP -std=c++11)
+check_include_file_cxx(aixlog.hpp HAS_AIXLOG_HPP "${CHECK_INCLUDE_FLAGS}")
 if(NOT HAS_AIXLOG_HPP)
     message(FATAL_ERROR "Need to have aixlog installed")
 endif()
