@@ -30,8 +30,6 @@
 #include "player/alsaPlayer.h"
 #endif
 
-#include "browsemDNS.h"
-
 #ifdef HAS_DAEMON
 #include "common/daemon.h"
 #endif

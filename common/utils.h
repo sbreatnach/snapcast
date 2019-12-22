@@ -35,7 +35,6 @@
 #include <cerrno>
 #include <iterator>
 #ifndef WINDOWS
-#include <windows.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <netinet/in.h>

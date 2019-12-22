@@ -252,6 +252,7 @@ Open the Developer Command Prompt for your Visual Studio installation and run th
 
     cd %USERPROFILE%
     mkdir winprojects
+    cd winprojects
     git clone https://github.com/microsoft/vcpkg
     cd vcpkg
     bootstrap-vcpkg.bat
